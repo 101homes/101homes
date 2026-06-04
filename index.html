@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="101Homes - India's Verified Property Platform" />
+  <title>101Homes | India's Verified Property Platform</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #FDFAF5; }
+    input[type=range] { cursor: pointer; }
+    button { font-family: Arial, sans-serif; }
+    select { font-family: Arial, sans-serif; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #2D6A4F; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+
+const listings = [
+  {
+    id: 1,
+    title: "Spacious 2BHK with Balcony",
+    area: "Koramangala 5th Block",
+    rent: 22000,
+    deposit: 66000,
+    bhk: 2,
+    floor: "3rd / 6",
+    sqft: 1050,
+    furnished: "Semi-Furnished",
+    available: true,
+    verifiedAt: "Today, 11:30 AM",
+    tags: ["Lift", "Parking", "24hr Water"],
+    images: "🏢",
+    owner: "Ramesh S.",
+    contact: "+91 98XXX XXXXX",
+  },
+  {
+    id: 2,
+    title: "Cozy 1BHK near Metro",
+    area: "HSR Layout Sector 2",
+    rent: 14500,
+    deposit: 43500,
+    bhk: 1,
+    floor: "1st / 4",
+    sqft: 620,
+    furnished: "Furnished",
+    available: true,
+    verifiedAt: "Today, 9:00 AM",
+    tags: ["Metro Nearby", "Gym", "Security"],
+    images: "🏠",
+    owner: "Priya K.",
+    contact: "+91 97XXX XXXXX",
+  },
+  {
+    id: 3,
+    title: "3BHK Premium Apartment",
+    area: "Indiranagar 12th Main",
+    rent: 38000,
+    deposit: 114000,
+    bhk: 3,
+    floor: "5th / 8",
+    sqft: 1600,
+    furnished: "Fully Furnished",
+    available: false,
+    verifiedAt: "Yesterday, 3:00 PM",
+    tags: ["Pool", "Club House", "Power Backup"],
+    images: "🏗️",
+    owner: "Vikram M.",
+    contact: "+91 96XXX XXXXX",
+  },
+  {
+    id: 4,
+    title: "Budget 1BHK for Students",
+    area: "BTM Layout 2nd Stage",
+    rent: 9500,
+    deposit: 28500,
+    bhk: 1,
+    floor: "2nd / 3",
+    sqft: 480,
+    furnished: "Semi-Furnished",
+    available: true,
+    verifiedAt: "Today, 2:15 PM",
+    tags: ["WiFi", "Gas Pipeline", "No Brokerage"],
+    images: "🏘️",
+    owner: "Suresh T.",
+    contact: "+91 95XXX XXXXX",
+  },
+  {
+    id: 5,
+    title: "2BHK Independent House",
+    area: "JP Nagar 7th Phase",
+    rent: 18000,
+    deposit: 54000,
+    bhk: 2,
+    floor: "Ground",
+    sqft: 900,
+    furnished: "Unfurnished",
+    available: true,
+    verifiedAt: "Today, 8:45 AM",
+    tags: ["Garden", "Pet Friendly", "Parking"],
+    images: "🏡",
+    owner: "Anitha R.",
+    contact: "+91 94XXX XXXXX",
+  },
+  {
+    id: 6,
+    title: "Studio Apartment IT Hub",
+    area: "Electronic City Phase 1",
+    rent: 11000,
+    deposit: 33000,
+    bhk: 1,
+    floor: "4th / 10",
+    sqft: 420,
+    furnished: "Furnished",
+    available: true,
+    verifiedAt: "Today, 12:00 PM",
+    tags: ["AC", "Modular Kitchen", "Gated"],
+    images: "🏙️",
+    owner: "Kavitha N.",
+    contact: "+91 93XXX XXXXX",
+  },
+];
+
+const areas = ["All Areas", "Koramangala", "HSR Layout", "Indiranagar", "BTM Layout", "JP Nagar", "Electronic City"];
+
+function App() {
+  const [selectedBHK, setSelectedBHK] = useState("All");
+  const [selectedArea, setSelectedArea] = useState("All Areas");
+  const [maxRent, setMaxRent] = useState(50000);
+  const [showOnlyAvailable, setShowOnlyAvailable] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [showListModal, setShowListModal] = useState(false);
+  const [unlocked, setUnlocked] = useState({});
+  const [formData, setFormData] = useState({ name: "", phone: "", bhk: "1", rent: "", area: "", furnished: "Semi-Furnished", desc: "" });
+  const [submitted, setSubmitted] = useState(false);
+
+  const filtered = listings.filter((l) => {
+    if (selectedBHK !== "All" && l.bhk !== parseInt(selectedBHK)) return false;
+    if (selectedArea !== "All Areas" && !l.area.includes(selectedArea)) return false;
+    if (l.rent > maxRent) return false;
+    if (showOnlyAvailable && !l.available) return false;
+    return true;
+  });
+
+  const handleUnlock = (id) => {
+    setUnlocked((prev) => ({ ...prev, [id]: true }));
+  };
+
+  return (
+    <div style={{ fontFamily: "'Georgia', serif", background: "#FDFAF5", minHeight: "100vh", color: "#1a1a1a" }}>
+      {/* Header */}
+      <header style={{ background: "#1C3F2F", padding: "0 24px", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 12px rgba(0,0,0,0.15)" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", height: 64 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 26 }}>🏡</span>
+            <div>
+              <div style={{ color: "#E8D5A3", fontWeight: 700, fontSize: 20, letterSpacing: 1 }}>101Homes</div>
+              <div style={{ color: "#7fb89a", fontSize: 10, letterSpacing: 2, textTransform: "uppercase" }}>India's Verified Property Platform</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12 }}>
+            <button onClick={() => setShowListModal(true)} style={{ background: "#E8D5A3", color: "#1C3F2F", border: "none", borderRadius: 8, padding: "8px 18px", fontWeight: 700, cursor: "pointer", fontSize: 13 }}>
+              + List Property
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Hero */}
+      <div style={{ background: "linear-gradient(135deg, #1C3F2F 0%, #2D6A4F 60%, #40916C 100%)", padding: "48px 24px 56px", textAlign: "center", position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 20% 50%, rgba(232,213,163,0.08) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(64,145,108,0.2) 0%, transparent 40%)" }} />
+        <div style={{ position: "relative" }}>
+          <div style={{ display: "inline-block", background: "rgba(232,213,163,0.15)", border: "1px solid rgba(232,213,163,0.3)", borderRadius: 20, padding: "4px 14px", fontSize: 12, color: "#E8D5A3", marginBottom: 16, letterSpacing: 1 }}>
+            ✓ EVERY LISTING PHYSICALLY VERIFIED
+          </div>
+          <h1 style={{ color: "#FDFAF5", fontSize: "clamp(24px, 5vw, 42px)", fontWeight: 700, margin: "0 0 12px", lineHeight: 1.2 }}>
+            Find Rentals You Can <span style={{ color: "#E8D5A3" }}>Actually Trust</span>
+          </h1>
+          <p style={{ color: "#95d5b2", fontSize: 16, margin: "0 0 32px" }}>No fake listings. No bait & switch. Every flat verified before it goes live.</p>
+
+          {/* Search Bar */}
+          <div style={{ background: "white", borderRadius: 14, padding: "6px 6px 6px 20px", display: "flex", alignItems: "center", maxWidth: 540, margin: "0 auto", boxShadow: "0 8px 32px rgba(0,0,0,0.2)", gap: 8 }}>
+            <span style={{ fontSize: 18 }}>🔍</span>
+            <input placeholder="Search by area, BHK, locality..." style={{ border: "none", outline: "none", flex: 1, fontSize: 15, color: "#1a1a1a", background: "transparent" }} />
+            <button style={{ background: "#1C3F2F", color: "white", border: "none", borderRadius: 10, padding: "10px 20px", fontWeight: 700, cursor: "pointer", fontSize: 14 }}>Search</button>
+          </div>
+
+          {/* Stats */}
+          <div style={{ display: "flex", justifyContent: "center", gap: 32, marginTop: 32 }}>
+            {[["24", "Active Listings"], ["100%", "Verified"], ["48hr", "Auto-Expire"]].map(([num, label]) => (
+              <div key={label} style={{ textAlign: "center" }}>
+                <div style={{ color: "#E8D5A3", fontSize: 22, fontWeight: 700 }}>{num}</div>
+                <div style={{ color: "#95d5b2", fontSize: 11, letterSpacing: 1 }}>{label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Trust Banner */}
+      <div style={{ background: "#E8D5A3", padding: "10px 24px" }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", justifyContent: "center", gap: "clamp(16px, 4vw, 48px)", flexWrap: "wrap" }}>
+          {["✅ No Bait & Switch", "📸 Real Photos Only", "⏰ Updated Every 48hrs", "🤝 Direct Owner Contact"].map((item) => (
+            <span key={item} style={{ fontSize: 13, fontWeight: 600, color: "#1C3F2F" }}>{item}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "32px 24px" }}>
+        <div style={{ display: "flex", gap: 24, alignItems: "flex-start", flexWrap: "wrap" }}>
+
+          {/* Filters Sidebar */}
+          <div style={{ width: 220, flexShrink: 0, background: "white", borderRadius: 16, padding: 20, boxShadow: "0 2px 16px rgba(0,0,0,0.06)", border: "1px solid #e8e0d0" }}>
+            <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 20, color: "#1C3F2F" }}>🎯 Filter</div>
+
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#666", marginBottom: 8, letterSpacing: 1 }}>BHK TYPE</div>
+              {["All", "1", "2", "3"].map((b) => (
+                <button key={b} onClick={() => setSelectedBHK(b)} style={{ display: "block", width: "100%", textAlign: "left", padding: "7px 12px", borderRadius: 8, border: "none", background: selectedBHK === b ? "#1C3F2F" : "transparent", color: selectedBHK === b ? "white" : "#444", cursor: "pointer", marginBottom: 4, fontSize: 14, fontWeight: selectedBHK === b ? 600 : 400 }}>
+                  {b === "All" ? "All Types" : `${b} BHK`}
+                </button>
+              ))}
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#666", marginBottom: 8, letterSpacing: 1 }}>AREA</div>
+              <select value={selectedArea} onChange={(e) => setSelectedArea(e.target.value)} style={{ width: "100%", padding: "8px 10px", borderRadius: 8, border: "1px solid #ddd", fontSize: 13, color: "#333", background: "white" }}>
+                {areas.map((a) => <option key={a}>{a}</option>)}
+              </select>
+            </div>
+
+            <div style={{ marginBottom: 20 }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#666", marginBottom: 8, letterSpacing: 1 }}>MAX RENT</div>
+              <input type="range" min={5000} max={50000} step={1000} value={maxRent} onChange={(e) => setMaxRent(parseInt(e.target.value))} style={{ width: "100%", accentColor: "#1C3F2F" }} />
+              <div style={{ fontSize: 13, color: "#1C3F2F", fontWeight: 700 }}>₹{maxRent.toLocaleString()}/mo</div>
+            </div>
+
+            <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
+              <input type="checkbox" checked={showOnlyAvailable} onChange={(e) => setShowOnlyAvailable(e.target.checked)} style={{ accentColor: "#1C3F2F", width: 16, height: 16 }} />
+              <span style={{ color: "#333" }}>Available Only</span>
+            </label>
+          </div>
+
+          {/* Listings */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <div style={{ fontSize: 15, color: "#555" }}><b style={{ color: "#1C3F2F" }}>{filtered.length}</b> properties found</div>
+              <div style={{ fontSize: 12, color: "#888" }}>Sorted by: Most Recent</div>
+            </div>
+
+            <div style={{ display: "grid", gap: 16 }}>
+              {filtered.length === 0 && (
+                <div style={{ textAlign: "center", padding: "60px 20px", color: "#999" }}>
+                  <div style={{ fontSize: 40, marginBottom: 12 }}>🏚️</div>
+                  <div style={{ fontSize: 16 }}>No listings match your filters</div>
+                </div>
+              )}
+              {filtered.map((listing) => (
+                <div key={listing.id} style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.06)", border: `1px solid ${listing.available ? "#e8e0d0" : "#f0e8e8"}`, opacity: listing.available ? 1 : 0.75 }}>
+                  <div style={{ display: "flex", gap: 0, flexWrap: "wrap" }}>
+                    {/* Image placeholder */}
+                    <div style={{ width: 180, minHeight: 160, background: listing.available ? "linear-gradient(135deg, #d8f3dc, #b7e4c7)" : "linear-gradient(135deg, #f5e6e6, #e8d0d0)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 48 }}>{listing.images}</div>
+                        <div style={{ fontSize: 11, color: listing.available ? "#2D6A4F" : "#a05050", fontWeight: 600, marginTop: 6 }}>
+                          {listing.available ? "🟢 AVAILABLE" : "🔴 RENTED"}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Details */}
+                    <div style={{ flex: 1, padding: "16px 20px", minWidth: 0 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 }}>
+                        <div>
+                          <h3 style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700, color: "#1a1a1a" }}>{listing.title}</h3>
+                          <div style={{ color: "#666", fontSize: 13 }}>📍 {listing.area}</div>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 22, fontWeight: 700, color: "#1C3F2F" }}>₹{listing.rent.toLocaleString()}</div>
+                          <div style={{ fontSize: 11, color: "#888" }}>per month</div>
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 16, margin: "12px 0", flexWrap: "wrap" }}>
+                        {[["🛏", `${listing.bhk} BHK`], ["📐", `${listing.sqft} sqft`], ["🪑", listing.furnished], ["🏢", `Floor ${listing.floor}`]].map(([icon, val]) => (
+                          <div key={val} style={{ fontSize: 12, color: "#555", display: "flex", alignItems: "center", gap: 4 }}>
+                            <span>{icon}</span><span>{val}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}>
+                        {listing.tags.map((tag) => (
+                          <span key={tag} style={{ background: "#f0faf4", border: "1px solid #c3e6cb", borderRadius: 20, padding: "2px 10px", fontSize: 11, color: "#2D6A4F", fontWeight: 500 }}>{tag}</span>
+                        ))}
+                      </div>
+
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 8 }}>
+                        <div style={{ background: "#fffbf0", border: "1px solid #f0d060", borderRadius: 8, padding: "4px 10px", fontSize: 11, color: "#7a6020" }}>
+                          ✓ Verified: {listing.verifiedAt}
+                        </div>
+                        <div style={{ display: "flex", gap: 8 }}>
+                          {listing.available && (
+                            <>
+                              {unlocked[listing.id] ? (
+                                <div style={{ background: "#e8f5e9", border: "1px solid #a5d6a7", borderRadius: 8, padding: "7px 14px", fontSize: 13, color: "#2D6A4F", fontWeight: 600 }}>
+                                  📞 {listing.contact}
+                                </div>
+                              ) : (
+                                <button onClick={() => handleUnlock(listing.id)} style={{ background: "#E8D5A3", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 13, fontWeight: 700, color: "#1C3F2F", cursor: "pointer" }}>
+                                  🔓 Unlock Contact (Free)
+                                </button>
+                              )}
+                              <button onClick={() => setSelectedListing(listing)} style={{ background: "#1C3F2F", border: "none", borderRadius: 8, padding: "7px 14px", fontSize: 13, fontWeight: 600, color: "white", cursor: "pointer" }}>
+                                View Details →
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Detail Modal */}
+      {selectedListing && (
+        <div onClick={() => setSelectedListing(null)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "white", borderRadius: 20, maxWidth: 520, width: "100%", padding: 28, maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+              <h2 style={{ margin: 0, fontSize: 20, color: "#1C3F2F" }}>{selectedListing.title}</h2>
+              <button onClick={() => setSelectedListing(null)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer", color: "#666" }}>✕</button>
+            </div>
+            <div style={{ fontSize: 28, textAlign: "center", background: "linear-gradient(135deg, #d8f3dc, #b7e4c7)", borderRadius: 12, padding: "24px", marginBottom: 20 }}>{selectedListing.images}</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 16 }}>
+              {[["Rent", `₹${selectedListing.rent.toLocaleString()}/mo`], ["Deposit", `₹${selectedListing.deposit.toLocaleString()}`], ["Size", `${selectedListing.sqft} sqft`], ["Floor", selectedListing.floor], ["Furnishing", selectedListing.furnished], ["Area", selectedListing.area]].map(([k, v]) => (
+                <div key={k} style={{ background: "#f8f5f0", borderRadius: 10, padding: "10px 14px" }}>
+                  <div style={{ fontSize: 11, color: "#888", marginBottom: 2 }}>{k}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#1a1a1a" }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ background: "#fffbf0", border: "1px solid #f0d060", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 13, color: "#7a6020" }}>
+              ✓ Physically verified on: <b>{selectedListing.verifiedAt}</b>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 20 }}>
+              {selectedListing.tags.map((t) => (
+                <span key={t} style={{ background: "#f0faf4", border: "1px solid #c3e6cb", borderRadius: 20, padding: "4px 12px", fontSize: 12, color: "#2D6A4F" }}>{t}</span>
+              ))}
+            </div>
+            {unlocked[selectedListing.id] ? (
+              <div style={{ background: "#e8f5e9", border: "1px solid #a5d6a7", borderRadius: 10, padding: "14px", textAlign: "center", fontSize: 16, fontWeight: 700, color: "#2D6A4F" }}>
+                📞 Owner: {selectedListing.owner} · {selectedListing.contact}
+              </div>
+            ) : (
+              <button onClick={() => { handleUnlock(selectedListing.id); }} style={{ width: "100%", background: "#1C3F2F", color: "white", border: "none", borderRadius: 12, padding: "14px", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+                🔓 Get Owner Contact — Free
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* List Property Modal */}
+      {showListModal && (
+        <div onClick={() => { setShowListModal(false); setSubmitted(false); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "white", borderRadius: 20, maxWidth: 480, width: "100%", padding: 28, maxHeight: "90vh", overflowY: "auto" }}>
+            {submitted ? (
+              <div style={{ textAlign: "center", padding: "32px 0" }}>
+                <div style={{ fontSize: 52, marginBottom: 16 }}>✅</div>
+                <h3 style={{ color: "#1C3F2F", margin: "0 0 8px" }}>Listing Submitted!</h3>
+                <p style={{ color: "#666", fontSize: 14 }}>We'll verify your property within 24 hours and list it for free.</p>
+                <button onClick={() => { setShowListModal(false); setSubmitted(false); }} style={{ background: "#1C3F2F", color: "white", border: "none", borderRadius: 10, padding: "12px 28px", marginTop: 16, fontWeight: 700, cursor: "pointer", fontSize: 15 }}>Done</button>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+                  <h2 style={{ margin: 0, fontSize: 20, color: "#1C3F2F" }}>List Your Property</h2>
+                  <button onClick={() => setShowListModal(false)} style={{ background: "none", border: "none", fontSize: 22, cursor: "pointer" }}>✕</button>
+                </div>
+                <div style={{ background: "#f0faf4", borderRadius: 10, padding: "10px 14px", marginBottom: 20, fontSize: 13, color: "#2D6A4F" }}>
+                  🎉 Listing is <b>100% FREE</b>. We only earn when we find you a tenant.
+                </div>
+                {[["Your Name", "name", "text", "Ramesh Kumar"], ["Phone Number", "phone", "tel", "+91 98XXX XXXXX"], ["Expected Rent (₹)", "rent", "number", "15000"], ["Area / Locality", "area", "text", "Koramangala 5th Block"]].map(([label, key, type, placeholder]) => (
+                  <div key={key} style={{ marginBottom: 14 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#444", marginBottom: 5 }}>{label}</div>
+                    <input type={type} placeholder={placeholder} value={formData[key]} onChange={(e) => setFormData({ ...formData, [key]: e.target.value })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid #ddd", fontSize: 14, boxSizing: "border-box" }} />
+                  </div>
+                ))}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#444", marginBottom: 5 }}>BHK Type</div>
+                  <select value={formData.bhk} onChange={(e) => setFormData({ ...formData, bhk: e.target.value })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid #ddd", fontSize: 14 }}>
+                    {["1", "2", "3", "4+"].map((b) => <option key={b} value={b}>{b} BHK</option>)}
+                  </select>
+                </div>
+                <div style={{ marginBottom: 20 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#444", marginBottom: 5 }}>Additional Details</div>
+                  <textarea placeholder="Floor, furnishing, amenities, preferred tenant..." value={formData.desc} onChange={(e) => setFormData({ ...formData, desc: e.target.value })} style={{ width: "100%", padding: "10px 14px", borderRadius: 10, border: "1px solid #ddd", fontSize: 14, height: 80, resize: "none", boxSizing: "border-box" }} />
+                </div>
+                <button onClick={() => setSubmitted(true)} style={{ width: "100%", background: "#1C3F2F", color: "white", border: "none", borderRadius: 12, padding: "14px", fontSize: 16, fontWeight: 700, cursor: "pointer" }}>
+                  Submit for Free Listing →
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Footer */}
+      <footer style={{ background: "#1C3F2F", color: "#95d5b2", textAlign: "center", padding: "24px", marginTop: 40, fontSize: 13 }}>
+        <div style={{ color: "#E8D5A3", fontWeight: 700, fontSize: 16, marginBottom: 4 }}>🏡 101Homes.com</div>
+        <div>Rent · Buy · Sell · 100% Verified Listings</div>
+        <div style={{ marginTop: 8, color: "#52b788", fontSize: 12 }}>© 2025 101Homes.com · No Fake Listings · No Bait & Switch</div>
+      </footer>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+  </script>
+</body>
+</html>
